@@ -11,7 +11,8 @@
 <body>
     <a href="/buttons">BUttons</a>
     <div class="container mx-auto">
-        <div class="bg-blue-500 w-50 h-50"></div>
+        <div class="btn btn-primary">Wauw Daisy</Button>
+        </div>
     </div>
 </body>
 </html>
