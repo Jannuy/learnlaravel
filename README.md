@@ -1,59 +1,115 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# MM24 Blog
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Setup on Windows
 
-## About Laravel
+Install these programs first:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+1. [Visual Studio Code](https://code.visualstudio.com/Download)
+2. [Git for Windows](https://git-scm.com/download/win)
+3. [PHP 8.3–8.x](https://windows.php.net/download/) — download the x64 ZIP, extract it (for example, to `C:\php`), and add that folder to your Windows `Path`. Search for **Edit environment variables for your account**, open `Path`, and add the PHP folder.
+4. [Composer](https://getcomposer.org/download/) — run `Composer-Setup.exe` and select the PHP executable when asked.
+5. [Node.js LTS](https://nodejs.org/en/download/) — this installs npm, which is used when the app runs.
+6. Bun — open PowerShell and run:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+   ```powershell
+   powershell -c "irm bun.sh/install.ps1 | iex"
+   ```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+7. [Docker Desktop](https://www.docker.com/products/docker-desktop/) — install and start it. The database runs in Docker.
 
-## Learning Laravel
+Open a new PowerShell window and check that the tools are available:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```powershell
+git --version
+php -v
+composer -V
+node -v
+npm -v
+bun --version
+docker compose version
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 1. Clone the project
 
-## Contributing
+```powershell
+git clone https://github.com/Jannuy/learnlaravel.git
+cd learnlaravel
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 2. Turn on PHP extensions
 
-## Code of Conduct
+Find the `php.ini` file used by PHP:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```powershell
+php --ini
+```
 
-## Security Vulnerabilities
+Open it in Visual Studio Code. If the file does not exist, copy `php.ini-development` from the PHP folder and name the copy `php.ini`. Check that `extension_dir` points to the `ext` folder. Then enable these extensions by removing `;` at the start of each line, or add the lines if they are missing:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```ini
+extension=curl
+extension=fileinfo
+extension=mbstring
+extension=openssl
+extension=pdo_mysql
+```
 
-## License
+Save the file, restart PowerShell, and check the extensions:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# learnlaravel
+```powershell
+php -m
+```
+
+The list should include `curl`, `fileinfo`, `mbstring`, `openssl`, and `pdo_mysql`. Laravel also needs `ctype`, `dom`, `PDO`, `session`, `tokenizer`, and `xml`.
+
+### 3. Install dependencies
+
+Run these commands in the project folder:
+
+```powershell
+composer install
+bun install
+```
+
+### 4. Set up the environment
+
+Copy `.env.example` to `.env` and create the app key:
+
+```powershell
+Copy-Item .env.example .env
+php artisan key:generate
+```
+
+The example `.env` is set up to use the MariaDB database from Docker Compose.
+
+### 5. Start the database and run migrations
+
+Make sure Docker Desktop is running, then start MariaDB:
+
+```powershell
+docker compose up -d
+```
+
+Wait for the database to respond:
+
+```powershell
+docker compose exec db mariadb-admin --host=127.0.0.1 --user=root --password=example --wait=30 ping
+```
+
+Create the database tables:
+
+```powershell
+php artisan migrate
+```
+
+### 6. Run the project
+
+```powershell
+composer run dev
+```
+
+Leave it running and visit [http://localhost:8000](http://localhost:8000). When finished, stop the database with:
+
+```powershell
+docker compose down
+```
